@@ -2,6 +2,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+use clap::Parser;
+use cutr::{options, Command};
+
 fn main() {
-    println!("Hello, world!");
+    let options = options::Options::parse();
+
+    if let Err(e) = Command::from(&options).run() {
+        eprintln!("{e}")
+    }
 }
