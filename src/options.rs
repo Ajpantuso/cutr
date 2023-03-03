@@ -31,7 +31,10 @@ impl FromStr for Range {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.split_once('-') {
-            Some((_, "")) => Err(anyhow::anyhow!("ranges must be terminated")),
+            Some((start, "")) => Ok(Self {
+                start: start.parse()?,
+                ..Default::default()
+            }),
             Some(("", end)) => Ok(Self {
                 end: end.parse()?,
                 ..Default::default()
@@ -56,6 +59,7 @@ impl IntoIterator for Range {
         match self {
             Self { start: 0, end: 0 } => Box::new(Vec::new().into_iter()),
             Self { start: 0, end } => Box::new(1..=end),
+            Self { start, end: 0 } => Box::new(start..),
             Self { start, end } if start > end => Box::new((end..=start).rev()),
             Self { start, end } => Box::new(start..=end),
         }
@@ -73,7 +77,7 @@ mod range_tests {
     #[test_case("1-3", Ok(Range::new(1, 3)) ; "1-3")]
     #[test_case("3-1", Ok(Range::new(3, 1)) ; "3-1")]
     #[test_case("-3", Ok(Range::new(0, 3)) ; "0-3")]
-    #[test_case("1-", Err(anyhow::anyhow!("")) ; "unterminated range")]
+    #[test_case("1-", Ok(Range::new(1, 0)) ; "1-")]
     fn from_str(s: &str, expected: Result<Range>) {
         let res = Range::from_str(s);
 
@@ -84,10 +88,17 @@ mod range_tests {
     }
 
     #[test_case(Range::new(1,1), vec![1] ; "1")]
+    #[test_case(Range::new(1,0), vec![1] ; "1-")]
     #[test_case(Range::new(1,3), vec![1,2,3] ; "1-3")]
     #[test_case(Range::new(3,1), vec![3,2,1] ; "3-1")]
     #[test_case(Range::new(0,3), vec![1,2,3] ; "-3")]
     fn into_iter(range: Range, expected: Vec<usize>) {
-        assert_eq!(expected, range.into_iter().collect::<Vec<usize>>());
+        assert_eq!(
+            expected,
+            range
+                .into_iter()
+                .take(expected.len())
+                .collect::<Vec<usize>>()
+        );
     }
 }

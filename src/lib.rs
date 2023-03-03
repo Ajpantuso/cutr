@@ -29,7 +29,11 @@ impl<'a> Command<'a> {
                         .fields
                         .iter()
                         .flat_map(|range| {
-                            range.clone().into_iter().filter_map(|idx| rec.get(idx - 1))
+                            range
+                                .clone()
+                                .into_iter()
+                                .take(rec.len())
+                                .filter_map(|idx| rec.get(idx - 1))
                         })
                         .collect::<Vec<&str>>()
                         .join(&self.options.delimiter.to_string());
