@@ -11,7 +11,9 @@ pub struct Options {
     #[arg(default_value = "\t")]
     pub delimiter: char,
     #[arg(short = 'f', long = "fields")]
-    pub fields: Vec<Range>,
+    pub fields: Option<Vec<Range>>,
+    #[arg(short = 'c', long = "characters")]
+    pub characters: Option<Vec<Range>>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
