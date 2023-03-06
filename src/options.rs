@@ -14,6 +14,8 @@ pub struct Options {
     pub fields: Option<Vec<Range>>,
     #[arg(short = 'c', long = "characters")]
     pub characters: Option<Vec<Range>>,
+    #[arg(short = 'b', long = "bytes")]
+    pub bytes: Option<Vec<Range>>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq)]
