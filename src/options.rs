@@ -2,13 +2,19 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-use clap::Parser;
+use clap::{ArgGroup, Parser};
 use std::str::FromStr;
 
 #[derive(Debug, Parser)]
+#[command(group(
+            ArgGroup::new("ranges")
+                .required(true)
+                .args(["fields", "characters", "bytes"]),
+        ))]
 pub struct Options {
     #[arg(short = 'd', long = "delimiter")]
     #[arg(default_value = "\t")]
+    #[arg(requires = "fields")]
     pub delimiter: char,
     #[arg(short = 'f', long = "fields")]
     pub fields: Option<Vec<Range>>,

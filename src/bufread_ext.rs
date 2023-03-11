@@ -16,16 +16,12 @@ impl<B: BufRead> BufReadExt<B> for B {
 }
 
 pub struct UnzipNewline<B: BufRead> {
-    buf: String,
     inner: B,
 }
 
 impl<B: BufRead> UnzipNewline<B> {
     fn new(inner: B) -> Self {
-        Self {
-            buf: String::new(),
-            inner,
-        }
+        Self { inner }
     }
 }
 
@@ -33,17 +29,17 @@ impl<B: BufRead> Iterator for UnzipNewline<B> {
     type Item = Result<(String, String)>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let res = match self.inner.read_line(&mut self.buf) {
+        let mut buf = String::new();
+
+        let res = match self.inner.read_line(&mut buf) {
             Ok(0) => None,
             Ok(_) => {
-                let (line, newline) = split_at_newline(&self.buf);
+                let (line, newline) = split_at_newline(&buf);
 
-                Some(Ok((line.to_owned(), newline.to_owned())))
+                Some(Ok((String::from(line), String::from(newline))))
             }
             Err(e) => Some(Err(anyhow::anyhow!(e))),
         };
-
-        self.buf.clear();
 
         res
     }
