@@ -6,26 +6,26 @@ use anyhow::Result;
 use std::io::BufRead;
 
 pub trait BufReadExt<B: BufRead> {
-    fn unzip_lines(self) -> UnzipNewline<B>;
+    fn zip_lines(self) -> ZipNewline<B>;
 }
 
 impl<B: BufRead> BufReadExt<B> for B {
-    fn unzip_lines(self) -> UnzipNewline<B> {
-        UnzipNewline::new(self)
+    fn zip_lines(self) -> ZipNewline<B> {
+        ZipNewline::new(self)
     }
 }
 
-pub struct UnzipNewline<B: BufRead> {
+pub struct ZipNewline<B: BufRead> {
     inner: B,
 }
 
-impl<B: BufRead> UnzipNewline<B> {
+impl<B: BufRead> ZipNewline<B> {
     fn new(inner: B) -> Self {
         Self { inner }
     }
 }
 
-impl<B: BufRead> Iterator for UnzipNewline<B> {
+impl<B: BufRead> Iterator for ZipNewline<B> {
     type Item = Result<(String, String)>;
 
     fn next(&mut self) -> Option<Self::Item> {

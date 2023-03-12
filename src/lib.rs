@@ -21,7 +21,7 @@ impl<'a> Command<'a> {
         let mut stdout = io::stdout().lock();
         let mut stderr = io::stderr().lock();
 
-        let buffer = io::BufReader::new(stdin).unzip_lines();
+        let buffer = io::BufReader::new(stdin).zip_lines();
 
         let mut lines: Box<dyn Iterator<Item = Result<String>>> = if self.options.fields.is_some() {
             Box::new(buffer.map(|r| {
