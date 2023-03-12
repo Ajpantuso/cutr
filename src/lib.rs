@@ -79,11 +79,20 @@ impl<'a> Command<'a> {
                         let bytes = line.bytes().collect::<Vec<u8>>();
 
                         match indexes.last() {
-                            //TODO: Properly handle reverse range
-                            Some(last) => bytes.get(first..=last - 1),
-                            None => bytes.get(first..=first),
+                            Some(last) if last - 1 < first => {
+                                bytes.get(last - 1..=first).map(|bs| {
+                                    let bs: Vec<u8> = bs.iter().cloned().rev().collect();
+
+                                    String::from_utf8_lossy(&bs).into_owned()
+                                })
+                            }
+                            Some(last) => bytes
+                                .get(first..=last - 1)
+                                .map(|bs| String::from_utf8_lossy(bs).into_owned()),
+                            None => bytes
+                                .get(first..=first)
+                                .map(|bs| String::from_utf8_lossy(bs).into_owned()),
                         }
-                        .map(|bs| String::from_utf8_lossy(bs).into_owned())
                     })
                     .collect::<String>(),
             ),
@@ -105,11 +114,14 @@ impl<'a> Command<'a> {
                             .collect::<Vec<String>>();
 
                         match indexes.last() {
-                            //TODO: Properly handle reverse range
-                            Some(last) => chars.get(first..=last - 1),
-                            None => chars.get(first..=first),
+                            Some(last) if last - 1 < first => {
+                                chars.get(last - 1..=first).map(|cs| {
+                                    cs.iter().cloned().rev().collect::<Vec<String>>().join("")
+                                })
+                            }
+                            Some(last) => chars.get(first..=last - 1).map(|cs| cs.join("")),
+                            None => chars.get(first..=first).map(|cs| cs.join("")),
                         }
-                        .map(|cs| cs.join(""))
                     })
                     .collect::<String>(),
             ),
